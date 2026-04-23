@@ -1,42 +1,67 @@
-GSoC'25 Project Summary: Improving Spilling Execution in DataFusion
+GSoC Project Summary: Improving Spilling Execution in DataFusion
+
 Contributor: SeoYoung Lee (@ding-young)
 Mentor: Yongting You (@2010YOU01)
 Organization: Apache DataFusion
 
 Goal
-Make spilling more robust and performant so that memory-intensive queries degrade gracefully instead of failing under memory pressure. Focus on external sorting as a testbed.
+
+The goal of this project was to improve how DataFusion handles memory pressure.
+Instead of queries failing when memory runs out, the aim was to make them slow down gracefully using disk (spilling)—with a focus on external sorting.
 
 Key Contributions
-Onboarding & small fixes – Improved OOM error messages, enabled memory tracking by default, added peak memory tracking in ExternalSorter.
 
-Compression for spill files – Added support for LZ4 and Zstd compression in SpillManager, updated metrics, and added benchmarks (reduces disk I/O and file size).
+Getting started & initial improvements
 
-Enhanced benchmarks & profiling – Made benchmark scripts (TPC-H, ClickBench) explicitly mark failed queries; added a utility to profile peak RSS and allocator memory.
+Improved out-of-memory (OOM) error messages
+Enabled memory tracking by default
+Added peak memory tracking in the external sorter
 
-Multi‑level merge stabilization – Helped review and validate multi‑level merge, removed obsolete APIs, verified memory consumption during merge phases.
+Compression for spill files
 
-Memory accounting fixes – Corrected accounting for sliced StringViewArray, IPC alignment, and cursor memory in loser trees (replaced fixed 2× multiplier with accurate tracking).
+Added LZ4 and Zstd compression support
+Reduced disk usage and I/O
+Updated metrics and added benchmarks
 
-Additional fixes – Fixed row converter panics, improved row format conversion for strings, added benchmarks for string conversions.
+Better benchmarks & profiling
 
+Improved benchmark scripts to clearly show failed queries
+Added tools to measure peak memory usage
+
+Multi-level merge improvements
+
+Helped review and stabilize multi-level merge
+Removed outdated APIs
+Verified memory usage during merge
+
+Memory tracking fixes
+
+Fixed incorrect memory accounting in multiple components
+Replaced rough estimates with accurate tracking
+
+Other fixes & improvements
+
+Fixed crashes in row conversion
+Improved handling of string data
+Added benchmarks for string-related operations
 Current Status & Future Work
-Some queries still fail under memory limits; root causes identified.
 
-Planned improvements:
+Some queries still fail under strict memory limits, but the main issues have been identified.
 
-Optimize loser tree cursor to release memory earlier.
+Next steps:
 
-Bound spilled batch sizes (e.g., 256–512 KB) instead of row count only.
+Reduce memory usage in merge structures
+Control spill batch sizes more efficiently
+Limit merge complexity to avoid high memory peaks
 
-Limit merge degree to reduce peak memory during merge.
+Future scope:
 
-Future: Extend work to other spilling operators (hash aggregation, sort‑merge join).
-
-Key Lessons
-Memory management is tricky, especially with variable‑sized data like strings; application‑level accounting and system RSS don’t always align.
-
-Comprehensive tests and benchmarks are essential to reproduce spilling scenarios and diagnose failures.
-
+Apply similar improvements to other operators like aggregation and joins
+Key Learnings
+Memory management is complex, especially with variable-size data like strings
+Memory tracked by the application and actual system memory can differ
+Strong testing and benchmarking are essential to debug such issues
 Acknowledgements
-Thanks to mentor Yongting You, Andrew Lamb, Roi Luvaton, and the DataFusion community for guidance and collaboration. Grateful to Google for the GSoC opportunity.
 
+Thanks to mentor Yongting You, Andrew Lamb, Roi Luvaton, and the DataFusion community for their support.
+Also grateful to Google for this GSoC opportunity.
